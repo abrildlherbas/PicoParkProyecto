@@ -30,7 +30,6 @@ const walls = [
 World.add(engine.world, walls);
 
 // ---------- NIVEL ----------
-const REQUIRED_PLAYERS = 4; // cámbialo a 1 para probar solo
 const KEY_SPAWN = { x: 480, y: 375 };
 const DOOR = { x: 880, y: 460, w: 50, h: 80 };
 const level = { key: { ...KEY_SPAWN }, keyHolder: null, doorOpen: false, won: false };
@@ -96,6 +95,7 @@ function checkGround(p) {
 // ---------- LÓGICA DEL NIVEL ----------
 function updateLevel() {
   const list = Object.entries(players);
+  const totalPlayersConnected = list.length;
 
   // Respawn de la llave si quien la cargaba cae o se desconecta
   if (level.keyHolder) {
@@ -136,7 +136,8 @@ function updateLevel() {
 
   if (level.keyHolder && inDoor(players[level.keyHolder])) level.doorOpen = true;
 
-  level.won = list.length >= REQUIRED_PLAYERS &&
+  // CONDICIÓN DE VICTORIA DINÁMICA: Requiere al menos 1 jugador conectado y que todos estén en la puerta
+  level.won = totalPlayersConnected > 0 &&
     list.every(([, p]) => inDoor(p)) &&
     level.doorOpen;
 }
