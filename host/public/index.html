@@ -18,15 +18,40 @@
     const ctx = canvas.getContext('2d');
     const socket = io();
 
-    socket.emit('viewer'); // este es el "Host", no un jugador
+    socket.emit('viewer');
 
-    socket.on('state', (players) => {
-      ctx.fillStyle = '#444';
-      ctx.fillRect(0, 520, 960, 40);
+    socket.on('state', ({ players, level, door }) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // suelo y plataforma
+      ctx.fillStyle = '#444';
+      ctx.fillRect(0, 500, 300, 40);
+      ctx.fillRect(370, 500, 220, 40);
+      ctx.fillRect(660, 500, 300, 40);
+      ctx.fillRect(400, 410, 160, 20);
+
+      // puerta (verde si está abierta)
+      ctx.fillStyle = level.doorOpen ? '#2ecc71' : '#8e44ad';
+      ctx.fillRect(door.x - door.w / 2, door.y - door.h / 2, door.w, door.h);
+
+      // llave
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(level.key.x, level.key.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      // jugadores
       for (const p of Object.values(players)) {
         ctx.fillStyle = p.color;
         ctx.fillRect(p.x - 20, p.y - 20, 40, 40);
+      }
+
+      // victoria
+      if (level.won) {
+        ctx.fillStyle = '#fff';
+        ctx.font = '60px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('¡NIVEL COMPLETADO!', 480, 270);
       }
     });
   </script>

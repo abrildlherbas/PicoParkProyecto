@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { io } from 'socket.io-client';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -25,9 +23,9 @@ export default function App() {
     });
 
     socket.on('connect', () => {
-    setConnected(true);
-    socket.emit('join');
-      });
+      setConnected(true);
+      socket.emit('join');
+    });
     socket.on('disconnect', () => setConnected(false));
     socket.on('welcome', (data) => setColor(data.color));
     socket.on('error_msg', (msg) => alert(msg));
@@ -39,16 +37,16 @@ export default function App() {
     socketRef.current?.emit(type, key);
   };
 
-  // Botón que envía keydown al presionar y keyup al soltar
+  // Botón con eventos táctiles crudos (permite multitouch)
   const Btn = ({ label, keyName, style }) => (
-    <TouchableOpacity
-      activeOpacity={0.6}
+    <View
       style={[styles.btn, style]}
-      onPressIn={() => send('keydown', keyName)}
-      onPressOut={() => send('keyup', keyName)}
+      onTouchStart={() => send('keydown', keyName)}
+      onTouchEnd={() => send('keyup', keyName)}
+      onTouchCancel={() => send('keyup', keyName)}
     >
       <Text style={styles.btnText}>{label}</Text>
-    </TouchableOpacity>
+    </View>
   );
 
   // Pantalla de conexión
